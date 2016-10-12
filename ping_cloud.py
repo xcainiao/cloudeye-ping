@@ -1,48 +1,44 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
+from ctypes import *
 import socket
 import struct
 import sys
 import os
-from ctypes import *
-
 
 
 class IP(Structure):
-    _fields_ = [    
-                ("version",       c_ubyte,  4),
-                ("tos",           c_ubyte,  8),
-                ("len",           c_ushort, 16),
-                ("id",            c_ushort),
-                ("offset",        c_ushort),
-                ("ttl",           c_ubyte,  8),
-                ("protocol_num",  c_ubyte,  8),
-                ("sum",           c_ushort, 16),
-                ("src",           c_uint),
-                ("dst",           c_uint),
-            ]
-    
+    _fields_ = [
+        ("version", c_ubyte, 4),
+        ("tos", c_ubyte, 8),
+        ("len", c_ushort, 16),
+        ("id", c_ushort),
+        ("offset", c_ushort),
+        ("ttl", c_ubyte, 8),
+        ("protocol_num", c_ubyte, 8),
+        ("sum", c_ushort, 16),
+        ("src", c_uint),
+        ("dst", c_uint),
+    ]
+
     def __new__(self, socket_buffer):
         return self.from_buffer_copy(socket_buffer)
-    
-    def __init__(self,socket_buffer = None):
+
+    def __init__(self, socket_buffer=None):
         self.protocol_map = {
                     1:"ICMP",
                     6:"TCP",
                     17:"UDP"
                     }
 
-        src = struct.pack("<L",self.src)
-        
-        dst = struct.pack("<L",self.dst)
+        src = struct.pack("<L", self.src)
+        dst = struct.pack("<L", self.dst)
         self.src_address = socket.inet_ntoa(src)
         self.dst_address = socket.inet_ntoa(dst)
         try:
             self.protocol = self.protocol_map[self.protocol_num]
         except:
             self.protocol = str(self.protocol_num)
-
-
 
 host = "192.168.0.101"                     #server ip
 send_bytes = 1
